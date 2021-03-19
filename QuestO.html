@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>QuestO</title>
+    <script src="QuestO.js"></script>
+
+    <style>
+        div {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // simulate a psychometric function
+        var xContrast = linspace(1, 255, 255);
+        var alpha = 135;
+        var beta = 0.1;
+        var gamma = 0.02;
+        var lambda = 0.01;
+        var truePF = [];
+        for (var i = 0; i < xContrast.length; i++) {
+            truePF[i] = gamma + (1 - lambda - gamma) / (1 + Math.exp(-beta * (xContrast[i] - alpha)));
+        }
+
+        // QuestO Simulation
+        var tRange = linspace(128, 150, 60);
+
+        var tSim = [];
+        for (var iSim = 0; iSim < 5000; iSim++) {
+            var Q = QuestOCreate(tRange);
+            for (var iTrial = 0; iTrial < 40; iTrial++) {
+                // simulate a response according to the underlying psychometric function
+                var xContrastZ = xContrast.map(x => Math.abs(x - Q.trial_value));
+                var truePFidx = xContrastZ.findIndex(e => e == Math.min.apply(null, xContrastZ));
+                Q.trial_outcome = Math.random() < truePF[truePFidx];
+                // update Quest priors
+                Q = QuestOUpdate(Q);
+            }
+
+            var tmp = QuestOFinish(Q);
+            tSim[iSim] = tmp.t;
+        }
+
+        function download_data(myData) {
+            var csv = '';
+            myData.forEach(function(simValue) {
+                csv += simValue.toString() + ',';
+                csv += "\n";
+            });
+
+            console.log(csv);
+            var hiddenElement = document.createElement('a');
+            hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+            hiddenElement.target = '_blank';
+            hiddenElement.download = 'QuestSimulationData.csv';
+            hiddenElement.click();
+        }
+    </script>
+
+    <div>
+        <h1>QuestO</h1>
+        <h2>A Javascript library to implement the Quest procedure in online experiments.</h2>
+        <p>This page compute 5000 simulations to verify the accuracy of the QUEST procedure.</p>
+        <p>Use this code to simulate the results of QuestO with a known psychometric function and a specific range of tested values.</p>
+
+        <button onclick="download_data(tSim)">Download Simulation Results</button>
+        <button onclick="download_data(Q.tPDF)">Download PDF data</button>
+        <button onclick="download_data(truePF)">Download Psychometric function</button>
+    </div>
+</body>
+
+</html>

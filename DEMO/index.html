@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>QuestO Demo</title>
+    <script src="jsPsych/jspsych.js"></script>
+    <script src="jsPsych/plugins/jspsych-instructions.js"></script>
+    <script src="jsPsych/plugins/jspsych-html-keyboard-response.js"></script>
+    <script src="jsPsych/psychophysics/jspsych-psychophysics.js"></script>
+
+    <script src="QuestO.js"></script>
+    <script src="QuestO_demo_psychophysics.js"></script>
+    <link rel="stylesheet" href="jsPsych/css/jspsych.css">
+</head>
+
+<body style="background-color:grey;">
+    <script>
+        var timeline = [];
+        for (i of Q_timeline) {
+            timeline.push(i)
+        }
+
+        jsPsych.init({
+            timeline: timeline,
+        });
+    </script>
+</body>
+
+</html>
